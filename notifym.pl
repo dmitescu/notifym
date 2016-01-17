@@ -72,7 +72,9 @@ sub send_notification {
 
 sub private_message_handler {
     my ($data, $signal, $signal_data) = @_;
-    
+    my %message = weechat::info_get_hashtable(
+	"irc_message_parse", $signal_data);
+    # send_notification("normal", "\"$message{nick}\"", "\"$message{text}\"");
     return weechat::WEECHAT_RC_OK;
 }
 
