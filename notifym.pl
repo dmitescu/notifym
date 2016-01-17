@@ -19,13 +19,13 @@
 my $SCRIPT_NAME = "notifym";
 my $VERSION = "0.1";
 
+#use Data::Dumper;
 
 weechat::register($SCRIPT_NAME, "dmitescu", $VERSION, "GPL3", 
 		  "Script which uses libnotify to alert the user about certain events.",
 		  "", "");
 
-my %options_def = ( #'urgency'          => ['normal', 'Notification urgency.'],
-		    'notify_pm'        => ['on',     'Notify on private message.'],
+my %options_def = ( 'notify_pm'        => ['on',     'Notify on private message.'],
 		    'notify_mention'   => ['on',     'Notify on mention in channel.'],
 		    'notify_server'    => ['off',    'Notify for every message coming from a server.'],
 		    'server_whitelist' => ['*',      'The servers from which you desire to receive notifications.']
@@ -60,10 +60,6 @@ sub update_config_handler {
 # Function to send notification
 sub send_notification {
     my ($urgency, $summary, $body) = @_;
-    if ($body == undef) {
-	$body = "";
-    }
-
     my $retval = system("notify-send -u $urgency \"$summary\" \"$body\"");
 }
 
@@ -72,15 +68,21 @@ sub send_notification {
 
 sub private_message_handler {
     my ($data, $signal, $signal_data) = @_;
-    my %message = weechat::info_get_hashtable(
-	"irc_message_parse", $signal_data);
-    # send_notification("normal", "\"$message{nick}\"", "\"$message{text}\"");
+    # my @pta = split(":", $signal_data);
+    # weechat::print("", Dumper(\%options));
+    my $hash_in = {"message" => $signal_data};
+    my $hash_data = weechat::info_get_hashtable("irc_message_parse", $hash_in);
+    my $nick = $hash_data->{"nick"};
+    my $text = $hash_data->{"text"};
+    # weechat::print("", Dumper($hash_data));
+    send_notification("normal", "$nick says:", "$text");
     return weechat::WEECHAT_RC_OK;
 }
 
 # Main execution point
 
 init();
+send_notification("critical", "Starting NotifyM plugin!", "");
 weechat::hook_config("plugins.var.perl." . $SCRIPT_NAME . ".*",
 		     "update_config_handler", "");
 weechat::hook_signal("irc_pv", "private_message_handler", "");
