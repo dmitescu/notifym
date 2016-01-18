@@ -63,6 +63,12 @@ sub send_notification {
     my $retval = system("notify-send -u $urgency \"$summary\" \"$body\"");
 }
 
+# Verify matching options
+sub opt_match {
+	my ($str, $option) = @_;
+	return $str =~ /$options{$option}[0]/;
+}
+
 # Handlers for signals :
 # Private message
 
