@@ -25,11 +25,18 @@ weechat::register($SCRIPT_NAME, "dmitescu", $VERSION, "GPL3",
 		  "Script which uses libnotify to alert the user about certain events.",
 		  "", "");
 
-my %options_def = ( 'notify_pv'         => ['on',     'Notify on private message.'],
-		    'notify_mention'    => ['on',     'Notify on mention in channel.'],
-		    'notify_channel'    => ['off',    'Notify all messages from a certain channel'],
-		    'notify_all'        => ['off',    'Notify for all messages.'],
-		    'channel_whitelist' => ['*',      'The channel from which you desire to receive notifications.']
+my %options_def = ( 'notify_pv'         => ['on',
+					    'Notify on private message.'],
+		    'notify_mention'    => ['on',
+					    'Notify on mention in channel.'],
+		    'notify_channels'   => ['off',
+					    'Notify all messages from whitelisted channels.'],
+		    'notify_servers'    => ['off',
+					    'Notify all messages from whitelisted servers.'],
+		    'channel_whitelist' => ['*',
+					    'Channel white-list. (perl regex required)']
+		    'server_whitelist'  => ['*',
+					    'Server white-list. (perl regex required)'
     );
 
 my %options = ();
