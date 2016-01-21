@@ -17,7 +17,7 @@
 #
 
 my $SCRIPT_NAME = "notifym";
-my $VERSION = "0.1";
+my $VERSION = "1.1";
 
 use Data::Dumper;
 
