@@ -19,16 +19,17 @@
 my $SCRIPT_NAME = "notifym";
 my $VERSION = "0.1";
 
-#use Data::Dumper;
+use Data::Dumper;
 
 weechat::register($SCRIPT_NAME, "dmitescu", $VERSION, "GPL3", 
 		  "Script which uses libnotify to alert the user about certain events.",
 		  "", "");
 
-my %options_def = ( 'notify_pm'        => ['on',     'Notify on private message.'],
-		    'notify_mention'   => ['on',     'Notify on mention in channel.'],
-		    'notify_server'    => ['off',    'Notify for every message coming from a server.'],
-		    'server_whitelist' => ['*',      'The servers from which you desire to receive notifications.']
+my %options_def = ( 'notify_pv'         => ['on',     'Notify on private message.'],
+		    'notify_mention'    => ['on',     'Notify on mention in channel.'],
+		    'notify_channel'    => ['off',    'Notify all messages from a certain channel'],
+		    'notify_all'        => ['off',    'Notify for all messages.'],
+		    'channel_whitelist' => ['*',      'The channel from which you desire to receive notifications.']
     );
 
 my %options = ();
@@ -72,16 +73,19 @@ sub opt_match {
 # Handlers for signals :
 # Private message
 
-sub private_message_handler {
+sub message_handler {
     my ($data, $signal, $signal_data) = @_;
     # my @pta = split(":", $signal_data);
     # weechat::print("", Dumper(\%options));
     my $hash_in = {"message" => $signal_data};
     my $hash_data = weechat::info_get_hashtable("irc_message_parse", $hash_in);
-    my $nick = $hash_data->{"nick"};
-    my $text = $hash_data->{"text"};
-    # weechat::print("", Dumper($hash_data));
-    send_notification("normal", "$nick says:", "$text");
+    if ($hash_data->{"command"} eq 'PRIVMSG') {
+	my $nick = $hash_data->{"nick"};
+	my $text = $hash_data->{"text"};
+	my $chan = $hash_data->{"channel"};
+	# weechat::print("", Dumper($hash_data));
+	send_notification("normal", "$nick says:", "$text");
+    }
     return weechat::WEECHAT_RC_OK;
 }
 
@@ -91,4 +95,4 @@ init();
 send_notification("critical", "Starting NotifyM plugin!", "");
 weechat::hook_config("plugins.var.perl." . $SCRIPT_NAME . ".*",
 		     "update_config_handler", "");
-weechat::hook_signal("irc_pv", "private_message_handler", "");
+weechat::hook_signal("*,irc_in_*", "message_handler", "");
