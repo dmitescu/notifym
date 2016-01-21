@@ -19,7 +19,7 @@
 my $SCRIPT_NAME = "notifym";
 my $VERSION = "1.1";
 
-use Data::Dumper;
+# use Data::Dumper;
 
 weechat::register($SCRIPT_NAME, "dmitescu", $VERSION, "GPL3", 
 		  "Script which uses libnotify to alert the user about certain events.",
