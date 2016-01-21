@@ -27,16 +27,16 @@ weechat::register($SCRIPT_NAME, "dmitescu", $VERSION, "GPL3",
 
 my %options_def = ( 'notify_pv'         => ['on',
 					    'Notify on private message.'],
-		    'notify_mention'    => ['on',
-					    'Notify on mention in channel.'],
+		    'notify_mentions'    => ['on',
+					    'Notify on mention in all channel.'],
 		    'notify_channels'   => ['off',
 					    'Notify all messages from whitelisted channels.'],
 		    'notify_servers'    => ['off',
 					    'Notify all messages from whitelisted servers.'],
-		    'channel_whitelist' => ['*',
-					    'Channel white-list. (perl regex required)']
-		    'server_whitelist'  => ['*',
-					    'Server white-list. (perl regex required)'
+		    'channel_whitelist' => ['.*',
+					    'Channel white-list. (perl regex required)'],
+		    'server_whitelist'  => ['.*',
+					    'Server white-list. (perl regex required)']
     );
 
 my %options = ();
@@ -74,7 +74,7 @@ sub send_notification {
 # Verify matching options
 sub opt_match {
 	my ($str, $option) = @_;
-	return $str =~ /$options{$option}[0]/;
+	return $str =~ /$options{$option}/;
 }
 
 # Handlers for signals :
@@ -84,14 +84,38 @@ sub message_handler {
     my ($data, $signal, $signal_data) = @_;
     # my @pta = split(":", $signal_data);
     # weechat::print("", Dumper(\%options));
-    my $hash_in = {"message" => $signal_data};
-    my $hash_data = weechat::info_get_hashtable("irc_message_parse", $hash_in);
-    if ($hash_data->{"command"} eq 'PRIVMSG') {
+    my ($server, $command) = $signal =~ /(.*),irc_in_(.*)/;
+    if ($command eq 'PRIVMSG') {
+	my $hash_in = {"message" => $signal_data};
+	my $hash_data = weechat::info_get_hashtable("irc_message_parse", $hash_in);
+
 	my $nick = $hash_data->{"nick"};
 	my $text = $hash_data->{"text"};
 	my $chan = $hash_data->{"channel"};
+	
+	if (($options{'notify_servers'} eq 'on') && 
+	    opt_match($server, 'server_whitelist')) {
+	    # Server match
+	    send_notification("normal", "$nick:", "$text");
+	} elsif (($options{'notify_channels'} eq 'on') &&
+		 opt_match($chan, 'channel_whitelist')){
+	    # Channel match
+	    send_notification("normal", "$nick:", "$text");
+	} elsif ($options{'notify_pv'} eq 'on') {
+	    # Private message match
+	    my $mynick = weechat::info_get("irc_nick", $server);
+	    if ($chan eq $mynick) {
+		send_notification("critical", "$nick says:", "$text");
+	    }
+	} else {
+	}
+	
+	# Mention match
+	my $mynick = weechat::info_get("irc_nick", $server);
+	if (index($text, $mynick) != -1) {
+	    send_notification("critical", "$nick mentioned you!", "");
+	}	
 	# weechat::print("", Dumper($hash_data));
-	send_notification("normal", "$nick says:", "$text");
     }
     return weechat::WEECHAT_RC_OK;
 }
