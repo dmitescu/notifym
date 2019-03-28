@@ -1,7 +1,7 @@
 # Version: 1.1
 
 Current version is 1.1. In case of questions, bugs,
-feature ideas, please contact `mitescugeorgedan@gmail.com`
+feature ideas, please contact `mitescugd@gmail.com`
 or use GitHub.
 
 # How-to-install
