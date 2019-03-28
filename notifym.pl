@@ -68,7 +68,7 @@ sub update_config_handler {
 # Function to send notification
 sub send_notification {
     my ($urgency, $summary, $body) = @_;
-    my $retval = system("notify-send -u $urgency \"$summary\" \"$body\"");
+    my $retval = system("notify-send", "-u", $urgency, $summary, $body);
 }
 
 # Verify matching options
