@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2016 Mitescu George Dan <mitescugeorgedan@gmail.com>
+# Copyright (c) 2016-2019 Mitescu George Dan <mitescugd@gmail.com>
+# Copyright (c) 2019 Silvan Mosberger <infinisil@icloud.com>
 # Copyright (c) 2016 Berechet Mihai <mihaibereket9954@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
