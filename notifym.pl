@@ -17,7 +17,7 @@
 #
 
 my $SCRIPT_NAME = "notifym";
-my $VERSION = "1.1";
+my $VERSION = "1.2";
 
 # use Data::Dumper;
 
@@ -123,7 +123,9 @@ sub message_handler {
 # Main execution point
 
 init();
-send_notification("critical", "Starting NotifyM plugin!", "");
+send_notification("critical",
+		  "Starting NotifyM plugin, version " . $VERSION . "!",
+		  "");
 weechat::hook_config("plugins.var.perl." . $SCRIPT_NAME . ".*",
 		     "update_config_handler", "");
 weechat::hook_signal("*,irc_in_*", "message_handler", "");
